@@ -17,6 +17,7 @@ RUN set -x \
     && mkdir -p               "${BITBUCKET_INSTALL}" \
     && curl -Ls               "https://www.atlassian.com/software/stash/downloads/binary/atlassian-bitbucket-${BITBUCKET_VERSION}.tar.gz" | tar -zx --directory  "${BITBUCKET_INSTALL}" --strip-components=1 --no-same-owner \
     && curl -Ls                "https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.36.tar.gz" | tar -xz --directory "${BITBUCKET_INSTALL}/lib" --strip-components=1 --no-same-owner "mysql-connector-java-5.1.36/mysql-connector-java-5.1.36-bin.jar" \
+    && curl -Ls -o ${BITBUCKET_INSTALL}/confluence/WEB-INF/lib/postgresql.jar    "https://jdbc.postgresql.org/download/postgresql-9.4.1208.jar" \
     && chmod -R 700           "${BITBUCKET_INSTALL}/conf" \
     && chmod -R 700           "${BITBUCKET_INSTALL}/logs" \
     && chmod -R 700           "${BITBUCKET_INSTALL}/temp" \
@@ -31,7 +32,8 @@ RUN set -x \
         --delete              "Server/Service/Engine/Host/@xmlValidation" \
         --delete              "Server/Service/Engine/Host/@xmlNamespaceAware" \
                               "${BITBUCKET_INSTALL}/conf/server.xml"
-
+RUN rm ${CONF_INSTALL}/confluence/WEB-INF/lib/atlassian-extras-decoder-v2-*.jar
+ADD atlassian-extras-decoder-v2-3.2.jar ${CONF_INSTALL}/confluence/WEB-INF/lib/
 # Use the default unprivileged account. This could be considered bad practice
 # on systems where multiple processes end up being executed by 'daemon' but
 # here we only ever run one process anyway.
